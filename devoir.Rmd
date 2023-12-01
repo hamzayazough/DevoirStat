@@ -3,17 +3,28 @@ output:
   pdf_document: default
   html_document: default
 ---
+```{r setup}
+library(ggplot2) # Sert à importer ggplot2 pour avoir plusieurs plots
+library(dplyr)
+library(coin)
+```
+
+
 ```{r}
 
 #initialisation
 source("charger.R")
 mondata <- charger(2212435)
+```
 
+####Phase 1:
+```{r}
 ####Partie a)
 
 #Histogramme
 h <-hist(mondata$IR, main = paste("Histogramme de l'indice de rugosité"), col = "lightpink", xlab = " Indice de rugosité (sans unité)", ylab = "Fréquence", xlim = c(0,30), ylim = c(0,50))
 text(h$mids,h$counts,labels=h$counts, adj=c(0.5, -0.5))
+
 
 #tukey
 boxplot(mondata$IR,    main=paste("Diagramme de tukey de l'indice de rugosité"),    horizontal=T, xlab = " Indice de rugosité (sans unité)",   col    =    "lightpink")
@@ -28,7 +39,6 @@ shapiro.test(mondata$IR)
 
 
 #tableau statistiques descriptives 
-
 conf_int <- t.test(mondata$IR)$conf.int
 Interval_Confiance_Min = conf_int[1]
   Interval_Confiance_Max = conf_int[2]
@@ -39,6 +49,7 @@ moyenne <- mean(mondata$IR)
 ecart_type <- sd(mondata$IR)
 
 dataframe1 <- data.frame(
+  
   moyenne,
   q1,
   q2,
@@ -54,65 +65,79 @@ knitr::kable(head(dataframe1),caption="Tableau des statistiques descriptives sur
 
 
 ```
-Explications: 
+###Explications: 
+
+L'histogramme de l'indice de rugosité révèle des caractéristiques significatives sur la distribution de cette mesure au sein de notre ensemble de données. Deux classes, 8 < x < 10 et 10 < x < 12, émergent nettement avec la fréquence la plus élevée, suggérant que la majorité des observations d'IR se concentrent dans ces plages.De plus, la dispersion des données n'est pas uniforme, indiquant des concentrations spécifiques plutôt qu'une répartition égale. Le centre de la distribution, approximativement à 11, révèle une tendance centrale significative. Nous pouvons voir avec l’histogramme et le diagramme de Tukey que la valeur de l’efficacité est assez bien répartie et que les valeurs sont plus étendues vers la droite, ce qui explique pourquoi la mediane (q2) est un peu moins élevé que la moyenne. Nous constatons aussi des données abérantes dans le Diagramme de Tukey. 
+
+
+Ces valeurs aberrantes peuvent avoir un impact sur les mesures de tendance centrale, comme la moyenne, et de dispersion (écart-type).C’est aussi cette distribution anormale (visible à droite de la droite d’Henry) qui amène les données à échouer le test de normalité. En effet, le test de Shapiro-Wilk nous donne une valeur p très proche de 0 (4.275e-06), ce qui est inférieur au seuil de 0.05.
 
 ```{r}
 ###partie b)
 # sous elements pour les types de M
-matiere_A <- subset(mondata, M == 0)
-matiere_B <- subset(mondata, M == 1)
+matiere_A <- filter(mondata, M == 0)
+matiere_B <- filter(mondata, M == 1)
+
+layout(matrix(1:2,1,2)) # permet de diviser la sortie graphique en deux
+hist(main = paste("Histogramme Materiau 0"), matiere_A$IR, col="black",border="white",xlab="Indice de rugosité",ylab="Fréquences")
+hist(matiere_B$IR, col="lightpink",border="black",
+main=paste("Histogramme Materiau 1"),xlab="Indice de rugosité",ylab="Fréquences")
+
+#Diagramme de Tukey
+ggplot(mondata, aes(y = factor(M), x = IR, fill = factor(M))) + geom_boxplot(fill = c("black", "lightpink"))+ labs(fill = "Materiau",title = "Diagramme de Tukey de l'IR par type de Materiau", y = "type de Materiau", x = "indice de Rugosite")
+
+#tableau des statistiques descriptives par groupe
+summary_table <- mondata %>%
+  group_by(M) %>%
+  summarise(
+    moyenne = mean(IR),
+    ecart_type_2 = sd(IR),
+    q1 = quantile(IR, 0.25),
+    q2 = quantile(IR, 0.5),
+    q3 = quantile(IR, 0.75),
+    Interval_Confiance_Min = t.test(IR)$conf.int[1],
+    Interval_Confiance_Max = t.test(IR)$conf.int[2]
+  )
 
 
-layout(matrix(c(1, 2), 2, 1, byrow = TRUE), heights = c(1.5, 1))
-
-hist(matiere_A$IR, col = rgb(0, 0, 1, 0.35), freq = FALSE, border = TRUE,
-     main = "Histogramme de l'IR selon le type de matériau",
-     xlab = "Indice de rugosité", ylab = "Densité")
-hist(matiere_B$IR, col = rgb(1, 0, 0, 0.35), freq = FALSE, add = TRUE, border = TRUE)
-legend("topright",    inset=0,    title="Type de matériau",
-c("Type 0","Type 1"),    fill=c(rgb(0,0,1,0.35),    rgb(1,0,0,0.35)),    cex    =    0.7)
-par(mar = c(5, 4, 4, 2) + 0.1)
-
-
-
-
-
-#####faire le dropbox qui ne fonctionne pas :(
-
-#boxplot(matiere_A$IR,matiere_B$IR,
-#horizontal= T, col= c(rgb(0,0,1,0.35),rgb(1,0,0,0.35)),
-#main = "Diagramme de Turey de l'IR selon le materiau", xlab="IR")
-
-
-
-
-###### faire le tableau des statistiques descriptives par groupe :((
-
-
-
-
-##### Test d'hypothese
-
-
-
-shapiro.test(matiere_A$IR)
-shapiro.test(matiere_B$IR)
-
-
-n1=length(matiere_A$IR)
-n2=length(matiere_B$IR)
-cat("n_1=",n1,    "\nn_2=",n2)
-
-
-##### test d'hypothese:
-V1=var(matiere_A$IR)
-V2=var(matiere_B$IR)
-Sp=sqrt(((n1-1)*V1+(n2-1)*V2)/(n1+n2-2))
-Z0=(sqrt(V1)-sqrt(V2))/(Sp*sqrt((1/(2*n1))+(1/(2*n2))))
-cat("\nZ0=",Z0,"\nZalpha/2=",qnorm(0.05/2,    lower.tail    =    F))
-
-
-Z1=(mean(matiere_A$IR)-mean(matiere_B$IR))/sqrt((V1/n1)+(V2/n2))
-cat("\nZ0=",Z1,"\nZalpha/2=",qnorm(0.05/2, lower.tail = F))
+knitr::kable(summary_table, caption = "Tableau des statistiques descriptives sur l'indice de rugosité pour le materiau 1 et 0")
 
 ```
+###Explication:
+Tout d'abord, les histogrammes illustrent que la plupart des valeurs se situent entre 5 et 15, avec des valeurs sont plus etendues vers la droite. Cette observation est cohérente avec les calculs des statistiques descriptives. En effet, en examinant les moyennes, le Matériau 0 affiche une moyenne plus élevée (11.49) par rapport au Matériau 1 (10.29), confirmant la tendance constaté. De plus, les quartiles et les intervalles de confiance décrivent la répartition des données, montrant que le Matériau 0 a une distribution plus étendue que le Matériau 1. Cette conclusion est également étayée par l'écart-type, qui est légèrement plus élevé pour le Matériau 0 (4.60) que pour le Matériau 1 (4.39). Les observations visuelles des diagrammes de Tukey renforcent ces résultats, suggérant que le centre du Matériau 0 est inférieur à celui du Matériau 1. De plus, bien que des données aberrantes soient présentes dans les deux matériaux, elles semblent être plus dispersées dans le Matériau 1. En résumé, on peut constater des différences substantielles entre les deux matériaux que ce soit de tendance centrale, de dispersion ou de la présence de données aberrantes.
+
+
+
+Avant de procéder aux tests d`hypothèses, nous allons effectuer le test de shapiro pour verifier si l'échantillon d'IR pour les deux types de matières suivent une loi normale:
+```{r}
+shapiro.test(matiere_A$IR)
+shapiro.test(matiere_B$IR)
+```
+
+Comme la valeur p est inférieure à 0.05 dans les deux cas (0.003767 < 0.05 et 7.851e-05 <<< 0.05), on rejette l'hypothèse nulle selon laquelle les échantillons suivent une distribution normale. Il est aussi possible de constater que la taille de chaque echantillon est relativement grand:
+
+```{r}
+##### Taille des echantillons
+n1=length(matiere_A$IR)
+n2=length(matiere_B$IR)
+cat("\nTaille echantillon Materiau 0=",n1,    "\nTaille echantillon Materiau 1=",n2)
+
+
+```
+####Placer les formules et tout ici:
+...
+###Tests   d’hypothese   moyenne   égale:
+
+```{r}
+
+##### test d'hypothese:
+
+#t.test(matiere_A$IR,matiere_B$IR, var.equal=FALSE)
+#test_var <- var.test(matiere_A$IR, matiere_B$IR)
+#test_var
+Z0=(mean(matiere_A$IR)-mean(matiere_B$IR))/sqrt((var(matiere_A$IR)/n1)+(var(matiere_B$IR)/n2))
+cat("Z0=",Z0,"\nZalpha/2=",qnorm(0.05/2, lower.tail = F))
+
+```
+
+Puisque Z0 < 1.959964, nous ne pouvons pas rejeter H0 à un niveau de confiance de 95%. Il n'y a donc pas suffisamment de preuves statistiques pour affirmer que les moyennes des deux groupes sont différentes. On ne peut donc pas conclure à une différence significative entre les moyennes de matière A et matière B
