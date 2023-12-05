@@ -161,12 +161,14 @@
 \end{Highlighting}
 \end{Shaded}
 
-\#\#\#\#Phase 1:
+\hypertarget{phase-1}{%
+\subsection{Phase 1:}\label{phase-1}}
+
+\hypertarget{partie-a}{%
+\subsubsection{Partie a)}\label{partie-a}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\DocumentationTok{\#\#\#\#Partie a)}
-
 \CommentTok{\#Histogramme}
 \NormalTok{h }\OtherTok{\textless{}{-}}\FunctionTok{hist}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR, }\AttributeTok{main =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Histogramme de l\textquotesingle{}indice de rugosité"}\NormalTok{), }\AttributeTok{col =} \StringTok{"lightpink"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{" Indice de rugosité (sans unité)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Fréquence"}\NormalTok{, }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{30}\NormalTok{), }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{50}\NormalTok{))}
 \FunctionTok{text}\NormalTok{(h}\SpecialCharTok{$}\NormalTok{mids,h}\SpecialCharTok{$}\NormalTok{counts,}\AttributeTok{labels=}\NormalTok{h}\SpecialCharTok{$}\NormalTok{counts, }\AttributeTok{adj=}\FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{0.5}\NormalTok{))}
@@ -212,54 +214,44 @@
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\#tableau statistiques descriptives }
-\NormalTok{conf\_int }\OtherTok{\textless{}{-}} \FunctionTok{t.test}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR)}\SpecialCharTok{$}\NormalTok{conf.int}
-\NormalTok{Interval\_Confiance\_Min }\OtherTok{=}\NormalTok{ conf\_int[}\DecValTok{1}\NormalTok{]}
-\NormalTok{  Interval\_Confiance\_Max }\OtherTok{=}\NormalTok{ conf\_int[}\DecValTok{2}\NormalTok{]}
-\NormalTok{q1 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR, }\FloatTok{0.25}\NormalTok{)}
-\NormalTok{q2 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR, }\FloatTok{0.5}\NormalTok{)}
-\NormalTok{q3 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR, }\FloatTok{0.75}\NormalTok{)}
-\NormalTok{moyenne }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR)}
-\NormalTok{ecart\_type }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR)}
 
-\NormalTok{dataframe1 }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
-  
-\NormalTok{  moyenne,}
-\NormalTok{  q1,}
-\NormalTok{  q2,}
-\NormalTok{  q3,}
-\NormalTok{  ecart\_type,}
-\NormalTok{  Interval\_Confiance\_Min,}
-\NormalTok{  Interval\_Confiance\_Max}
+\NormalTok{summary\_table }\OtherTok{\textless{}{-}}\NormalTok{ mondata }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{moyenne =} \FunctionTok{mean}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR),}
+    \AttributeTok{ecart\_type\_2 =} \FunctionTok{sd}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR),}
+    \AttributeTok{q1 =} \FunctionTok{quantile}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR, }\FloatTok{0.25}\NormalTok{),}
+    \AttributeTok{q2 =} \FunctionTok{quantile}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR, }\FloatTok{0.5}\NormalTok{),}
+    \AttributeTok{q3 =} \FunctionTok{quantile}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR, }\FloatTok{0.75}\NormalTok{),}
+    \AttributeTok{Interval\_Confiance\_Min =} \FunctionTok{t.test}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR)}\SpecialCharTok{$}\NormalTok{conf.int[}\DecValTok{1}\NormalTok{],}
+    \AttributeTok{Interval\_Confiance\_Max =} \FunctionTok{t.test}\NormalTok{(mondata}\SpecialCharTok{$}\NormalTok{IR)}\SpecialCharTok{$}\NormalTok{conf.int[}\DecValTok{2}\NormalTok{]}
+\NormalTok{  )}
 
-\NormalTok{)}
 
-\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(}\FunctionTok{head}\NormalTok{(dataframe1),}\AttributeTok{caption=}\StringTok{"Tableau des statistiques descriptives sur l\textquotesingle{}indice de rugosité"}\NormalTok{)}
+\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(summary\_table, }\AttributeTok{caption =} \StringTok{"Tableau des statistiques descriptives sur l\textquotesingle{}indice de rugosité"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0476}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1071}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0476}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0595}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0595}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1310}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.2738}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.2738}}@{}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1098}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1585}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0488}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0610}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0610}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2805}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2805}}@{}}
 \caption{Tableau des statistiques descriptives sur l'indice de
 rugosité}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+\begin{minipage}[b]{\linewidth}\raggedleft
 moyenne
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+ecart\_type\_2
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 q1
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 q2
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 q3
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-ecart\_type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 Interval\_Confiance\_Min
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
@@ -268,17 +260,16 @@ Interval\_Confiance\_Max
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+\begin{minipage}[b]{\linewidth}\raggedleft
 moyenne
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+ecart\_type\_2
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 q1
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 q2
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 q3
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-ecart\_type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 Interval\_Confiance\_Min
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
@@ -288,36 +279,35 @@ Interval\_Confiance\_Max
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-25\% & 10.85854 & 8.3 & 10.6 & 13.1 & 4.517969 & 10.23638 & 11.48069 \\
+10.85854 & 4.517969 & 8.3 & 10.6 & 13.1 & 10.23638 & 11.48069 \\
 \end{longtable}
 
-\#\#\#Explications:
+\hypertarget{explications}{%
+\subsubsection{Explications:}\label{explications}}
 
 L'histogramme de l'indice de rugosité révèle des caractéristiques
 significatives sur la distribution de cette mesure au sein de notre
 ensemble de données. Deux classes, 8 \textless{} x \textless{} 10 et 10
-\textless{} x \textless{} 12, émergent nettement avec la fréquence la
+\textless{} x \textless{} 12, émergent nettement avec les fréquences les
 plus élevée, suggérant que la majorité des observations d'IR se
 concentrent dans ces plages.De plus, la dispersion des données n'est pas
 uniforme, indiquant des concentrations spécifiques plutôt qu'une
-répartition égale. Le centre de la distribution, approximativement à 11,
-révèle une tendance centrale significative. Nous pouvons voir avec
-l'histogramme et le diagramme de Tukey que la valeur de l'efficacité est
-assez bien répartie et que les valeurs sont plus étendues vers la
-droite, ce qui explique pourquoi la mediane (q2) est un peu moins élevé
-que la moyenne. Nous constatons aussi des données abérantes dans le
-Diagramme de Tukey.
-
-Ces valeurs aberrantes peuvent avoir un impact sur les mesures de
-tendance centrale, comme la moyenne, et de dispersion (écart-type).C'est
+répartition égale. Nous pouvons voir avec l'histogramme et le diagramme
+de Tukey que les valeurs de l'IR sont assez bien répartie et que les
+valeurs sont plus étendues vers la droite, ce qui explique pourquoi la
+mediane (q2) est un peu moins élevé que la moyenne. Nous constatons
+aussi des données abérantes dans le Diagramme de Tukey. Ces valeurs
+aberrantes peuvent avoir un impact sur la moyenne et l'écart-type.C'est
 aussi cette distribution anormale (visible à droite de la droite
 d'Henry) qui amène les données à échouer le test de normalité. En effet,
 le test de Shapiro-Wilk nous donne une valeur p très proche de 0
 (4.275e-06), ce qui est inférieur au seuil de 0.05.
 
+\hypertarget{partie-b}{%
+\subsubsection{partie b)}\label{partie-b}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\DocumentationTok{\#\#\#partie b)}
 \CommentTok{\# sous elements pour les types de M}
 \NormalTok{matiere\_A }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(mondata, M }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
 \NormalTok{matiere\_B }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(mondata, M }\SpecialCharTok{==} \DecValTok{1}\NormalTok{)}
@@ -418,24 +408,27 @@ Interval\_Confiance\_Max
 1 & 10.28796 & 4.387849 & 8.175 & 9.9 & 12.125 & 9.450959 & 11.12497 \\
 \end{longtable}
 
-\#\#\#Explication: Tout d'abord, les histogrammes illustrent que la
-plupart des valeurs se situent entre 5 et 15, avec des valeurs sont plus
-etendues vers la droite. Cette observation est cohérente avec les
-calculs des statistiques descriptives. En effet, en examinant les
-moyennes, le Matériau 0 affiche une moyenne plus élevée (11.49) par
-rapport au Matériau 1 (10.29), confirmant la tendance constaté. De plus,
-les quartiles et les intervalles de confiance décrivent la répartition
-des données, montrant que le Matériau 0 a une distribution plus étendue
-que le Matériau 1. Cette conclusion est également étayée par
-l'écart-type, qui est légèrement plus élevé pour le Matériau 0 (4.60)
-que pour le Matériau 1 (4.39). Les observations visuelles des diagrammes
-de Tukey renforcent ces résultats, suggérant que le centre du Matériau 0
-est inférieur à celui du Matériau 1. De plus, bien que des données
-aberrantes soient présentes dans les deux matériaux, elles semblent être
-plus dispersées dans le Matériau 1. En résumé, on peut constater des
-différences substantielles entre les deux matériaux que ce soit de
-tendance centrale, de dispersion ou de la présence de données
-aberrantes.
+\hypertarget{explication}{%
+\subsubsection{Explication:}\label{explication}}
+
+Tout d'abord, les histogrammes nous permet de constater que la plupart
+des valeurs pour les deux matériaux se situent dans les mêmes classes
+(classe 5-10 et classe 10-15), avec des valeurs plus etendues vers la
+droite. Les histogrammes et le diagramme nous permettent de constater
+que la moyenne du Matériau 0 est plus élevée que celle du Matériau 1 par
+leurs distributions. Cette observation est cohérente avec les calculs
+des statistiques descriptives. En effet, en examinant les moyennes, le
+Matériau 0 affiche une moyenne de 11.49 et de 10.29 pour Matériau 1,
+confirmant la tendance constaté. De plus, les quartiles et les
+intervalles de confiance décrivent la répartition des données, montrant
+que le Matériau 0 a une distribution plus étendue que le Matériau 1.
+Cette conclusion est également étayée par l'écart-type, qui est
+légèrement plus élevé pour le Matériau 0 (4.60) que pour le Matériau 1
+(4.39). Les observations du diagramme de Tukey renforce ces résultats,
+suggérant que le centre du Matériau 0 est inférieur à celui du Matériau
+1. En résumé, on peut constater des différences entre les deux matériaux
+que ce soit de tendance centrale, de dispersion ou de la présence de
+données aberrantes.
 
 Avant de procéder aux tests d`hypothèses, nous allons effectuer le test
 de shapiro pour verifier si l'échantillon d'IR pour les deux types de
@@ -469,51 +462,55 @@ matières suivent une loi normale:
 ## W = 0.93804, p-value = 7.851e-05
 \end{verbatim}
 
+\hypertarget{tests-dhypothese-moyenne-uxe9gale}{%
+\subsubsection{Tests d'hypothese moyenne
+égale:}\label{tests-dhypothese-moyenne-uxe9gale}}
+
 Comme la valeur p est inférieure à 0.05 dans les deux cas (0.003767
 \textless{} 0.05 et 7.851e-05 \textless\textless\textless{} 0.05), on
 rejette l'hypothèse nulle selon laquelle les échantillons suivent une
-distribution normale. Il est aussi possible de constater que la taille
-de chaque echantillon est relativement grand:
+distribution normale.Nous allons donc utiliser le test de student afin
+de vérifier si les deux moyennes sont égales. Voici nos hypothèses:
+
+\(H_0: \mu_1 = \mu_2\) \(H_1: \mu_1 \neq \mu_2\)
+
+Puisque les variances sont inconnues, nous allons utiliser le test de
+Student suivant:
+
+\(Z_0 = (\bar{X_1} - \bar{X_2}) / \sqrt[2]{(S_1^2/n_1)+(S_2^2/n_2)}\)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\DocumentationTok{\#\#\#\#\# Taille des echantillons}
-\NormalTok{n1}\OtherTok{=}\FunctionTok{length}\NormalTok{(matiere\_A}\SpecialCharTok{$}\NormalTok{IR)}
-\NormalTok{n2}\OtherTok{=}\FunctionTok{length}\NormalTok{(matiere\_B}\SpecialCharTok{$}\NormalTok{IR)}
-\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Taille echantillon Materiau 0="}\NormalTok{,n1,    }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Taille echantillon Materiau 1="}\NormalTok{,n2)}
+\CommentTok{\# test d\textquotesingle{}hypothese:}
+\FunctionTok{source}\NormalTok{(}\StringTok{"charger.R"}\NormalTok{)}
+\NormalTok{mondata }\OtherTok{\textless{}{-}} \FunctionTok{charger}\NormalTok{(}\DecValTok{2212435}\NormalTok{)}
+\NormalTok{matiere\_A }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(mondata, M }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
+\NormalTok{matiere\_B }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(mondata, M }\SpecialCharTok{==} \DecValTok{1}\NormalTok{)}
+
+\FunctionTok{t.test}\NormalTok{(matiere\_A}\SpecialCharTok{$}\NormalTok{IR,matiere\_B}\SpecialCharTok{$}\NormalTok{IR)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 ## 
-## Taille echantillon Materiau 0= 97 
-## Taille echantillon Materiau 1= 108
+##  Welch Two Sample t-test
+## 
+## data:  matiere_A$IR and matiere_B$IR
+## t = 1.9157, df = 198.26, p-value = 0.05685
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.03546338  2.44716632
+## sample estimates:
+## mean of x mean of y 
+##  11.49381  10.28796
 \end{verbatim}
 
-\#\#\#\#Placer les formules et tout ici: \ldots{} \#\#\#Tests
-d'hypothese moyenne égale:
+\hypertarget{interpruxe9tation}{%
+\subsubsection{Interprétation:}\label{interpruxe9tation}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\DocumentationTok{\#\#\#\#\# test d\textquotesingle{}hypothese:}
-
-\CommentTok{\#t.test(matiere\_A$IR,matiere\_B$IR, var.equal=FALSE)}
-\CommentTok{\#test\_var \textless{}{-} var.test(matiere\_A$IR, matiere\_B$IR)}
-\CommentTok{\#test\_var}
-\NormalTok{Z0}\OtherTok{=}\NormalTok{(}\FunctionTok{mean}\NormalTok{(matiere\_A}\SpecialCharTok{$}\NormalTok{IR)}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(matiere\_B}\SpecialCharTok{$}\NormalTok{IR))}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{((}\FunctionTok{var}\NormalTok{(matiere\_A}\SpecialCharTok{$}\NormalTok{IR)}\SpecialCharTok{/}\NormalTok{n1)}\SpecialCharTok{+}\NormalTok{(}\FunctionTok{var}\NormalTok{(matiere\_B}\SpecialCharTok{$}\NormalTok{IR)}\SpecialCharTok{/}\NormalTok{n2))}
-\FunctionTok{cat}\NormalTok{(}\StringTok{"Z0="}\NormalTok{,Z0,}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Zalpha/2="}\NormalTok{,}\FunctionTok{qnorm}\NormalTok{(}\FloatTok{0.05}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }\AttributeTok{lower.tail =}\NormalTok{ F))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Z0= 1.915663 
-## Zalpha/2= 1.959964
-\end{verbatim}
-
-Puisque Z0 \textless{} 1.959964, nous ne pouvons pas rejeter H0 à un
-niveau de confiance de 95\%. Il n'y a donc pas suffisamment de preuves
-statistiques pour affirmer que les moyennes des deux groupes sont
-différentes. On ne peut donc pas conclure à une différence significative
-entre les moyennes de matière A et matière B
+Puisque le p-value est suppérieur à 0.05 (0.05685 \textgreater{} 0.05)
+donc nous ne pouvons pas rejeter H0 à un niveau de confiance de 95\%. Il
+n'y a donc pas suffisamment de preuves statistiques pour affirmer que
+les moyennes des deux groupes sont egales.
 
 \end{document}
